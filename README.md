@@ -78,20 +78,20 @@ Folder `laporan/` digunakan untuk menyimpan dokumentasi laporan proyek. Notebook
 
 ## Peta Komponen Proyek
 
-| Komponen | File utama | Status |
+| Komponen | File utama |
 |---|---|---|
-| Business Understanding | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
-| Data Gathering | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
-| Data Understanding / EDA | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
-| Cleaning | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
-| Dataset mentah | `data/raw/student-mat.csv` | Tersedia |
-| Validasi data dan checksum | `src/common.py` | Tersedia |
-| Training model | `src/train.py` | Kode tersedia, membutuhkan konfigurasi |
-| Penggabungan metrik | `src/merge_metrics.py` | Kode tersedia, membutuhkan hasil training |
-| Inferensi | `src/predict.py` | Kode tersedia, membutuhkan model hasil training |
-| Dependensi Python | `requirements.txt` | Tersedia, tetapi belum mencakup seluruh dependensi `src/` |
-| Konfigurasi eksperimen | `config.yaml` | Belum tersedia pada root repo |
-| Artefak model/hasil | `outputs/` | Belum tersedia pada root repo |
+| Business Understanding | `notebooks/01_business_data_understanding.ipynb` | 
+| Data Gathering | `notebooks/01_business_data_understanding.ipynb` | 
+| Data Understanding / EDA | `notebooks/01_business_data_understanding.ipynb` | 
+| Cleaning | `notebooks/01_business_data_understanding.ipynb` | 
+| Dataset mentah | `data/raw/student-mat.csv` | 
+| Validasi data dan checksum | `src/common.py` |
+| Training model | `src/train.py` | 
+| Penggabungan metrik | `src/merge_metrics.py` | 
+| Inferensi | `src/predict.py` | 
+| Dependensi Python | `requirements.txt` | 
+| Konfigurasi eksperimen | `config.yaml` | 
+| Artefak model/hasil | `outputs/` | 
 
 ## 1. Notebook Business Understanding, Data Gathering, EDA, dan Cleaning
 
