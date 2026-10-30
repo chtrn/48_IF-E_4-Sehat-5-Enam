@@ -1,0 +1,104 @@
+{
+  "early_all": {
+    "n": 395,
+    "include_absences": false,
+    "drop_g3_zero": false,
+    "summary": [
+      {
+        "model": "Baseline mean",
+        "rmse_mean": 4.578107206144548,
+        "rmse_std": 0.20297123132907227,
+        "mae_mean": 3.43320514874753,
+        "r2_mean": -0.008098183681203372,
+        "recall_mean": 1.0,
+        "precision_mean": 0.3291139240506329
+      },
+      {
+        "model": "Random Forest",
+        "rmse_mean": 4.294445049751082,
+        "rmse_std": 0.3772756798568961,
+        "mae_mean": 3.2425850914205347,
+        "r2_mean": 0.11196934529516932,
+        "recall_mean": 0.7435897435897435,
+        "precision_mean": 0.42748031472246617
+      },
+      {
+        "model": "Ridge Regression",
+        "rmse_mean": 4.3767500640042,
+        "rmse_std": 0.35398988092708017,
+        "mae_mean": 3.3358563433056494,
+        "r2_mean": 0.07792558156832514,
+        "recall_mean": 0.7153846153846153,
+        "precision_mean": 0.4214747889578865
+      }
+    ]
+  },
+  "midperiod_all": {
+    "n": 395,
+    "include_absences": true,
+    "drop_g3_zero": false,
+    "summary": [
+      {
+        "model": "Baseline mean",
+        "rmse_mean": 4.578107206144548,
+        "rmse_std": 0.20297123132907227,
+        "mae_mean": 3.43320514874753,
+        "r2_mean": -0.008098183681203372,
+        "recall_mean": 1.0,
+        "precision_mean": 0.3291139240506329
+      },
+      {
+        "model": "Random Forest",
+        "rmse_mean": 3.8478737042351345,
+        "rmse_std": 0.4144412121533262,
+        "mae_mean": 2.91010970464135,
+        "r2_mean": 0.28526458789241654,
+        "recall_mean": 0.7461538461538463,
+        "precision_mean": 0.4548129193851978
+      },
+      {
+        "model": "Ridge Regression",
+        "rmse_mean": 4.361867549093389,
+        "rmse_std": 0.35995116028609314,
+        "mae_mean": 3.345527996455642,
+        "r2_mean": 0.08404264510607667,
+        "recall_mean": 0.7128205128205127,
+        "precision_mean": 0.4148696649586475
+      }
+    ]
+  },
+  "early_without_g3_zero": {
+    "n": 357,
+    "include_absences": false,
+    "drop_g3_zero": true,
+    "summary": [
+      {
+        "model": "Baseline mean",
+        "rmse_mean": 3.225623054762899,
+        "rmse_std": 0.19455936604041443,
+        "mae_mean": 2.638801670055685,
+        "r2_mean": -0.014522186800374648,
+        "recall_mean": 0.0,
+        "precision_mean": 0.0
+      },
+      {
+        "model": "Random Forest",
+        "rmse_mean": 2.916877903967419,
+        "rmse_std": 0.2585416307815833,
+        "mae_mean": 2.342372326551904,
+        "r2_mean": 0.1688577499525012,
+        "recall_mean": 0.5764132553606238,
+        "precision_mean": 0.3961887001887002
+      },
+      {
+        "model": "Ridge Regression",
+        "rmse_mean": 3.0120607057485604,
+        "rmse_std": 0.25225958205806176,
+        "mae_mean": 2.457727914621356,
+        "r2_mean": 0.10989217453716534,
+        "recall_mean": 0.5951267056530214,
+        "precision_mean": 0.4360248824797544
+      }
+    ]
+  }
+}

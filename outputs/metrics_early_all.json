@@ -1,0 +1,34 @@
+{
+  "n": 395,
+  "include_absences": false,
+  "drop_g3_zero": false,
+  "summary": [
+    {
+      "model": "Baseline mean",
+      "rmse_mean": 4.578107206144548,
+      "rmse_std": 0.20297123132907227,
+      "mae_mean": 3.43320514874753,
+      "r2_mean": -0.008098183681203372,
+      "recall_mean": 1.0,
+      "precision_mean": 0.3291139240506329
+    },
+    {
+      "model": "Random Forest",
+      "rmse_mean": 4.294445049751082,
+      "rmse_std": 0.3772756798568961,
+      "mae_mean": 3.2425850914205347,
+      "r2_mean": 0.11196934529516932,
+      "recall_mean": 0.7435897435897435,
+      "precision_mean": 0.42748031472246617
+    },
+    {
+      "model": "Ridge Regression",
+      "rmse_mean": 4.3767500640042,
+      "rmse_std": 0.35398988092708017,
+      "mae_mean": 3.3358563433056494,
+      "r2_mean": 0.07792558156832514,
+      "recall_mean": 0.7153846153846153,
+      "precision_mean": 0.4214747889578865
+    }
+  ]
+}
