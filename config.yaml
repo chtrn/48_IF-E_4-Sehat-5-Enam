@@ -1,0 +1,45 @@
+project:
+  name: "Prediksi Dini Nilai Akhir Matematika"
+  random_seed: 42
+
+data:
+  path: "data/raw/student-mat.csv"
+  separator: ";"
+  expected_rows: 395
+  expected_columns: 33
+  sha256: "e47f9ee225e1ee6e69b7564e6dac7123e80b8486677fe111f351964cef5dec80"
+
+target:
+  column: "G3"
+  actual_risk_threshold: 10
+  predicted_warning_threshold: 11
+
+features:
+  always_exclude:
+    - "G1"
+    - "G2"
+  early_prediction_exclude:
+    - "absences"
+
+validation:
+  n_splits: 5
+  n_repeats: 3
+  stratify_by:
+    - "risk"
+    - "g3_zero"
+
+models:
+  ridge:
+    alpha: 1.0
+
+  random_forest:
+    n_estimators: 300
+    min_samples_leaf: 1
+    max_features: 1.0
+    n_jobs: 1
+
+outputs:
+  directory: "outputs"
+  model_file: "model.joblib"
+  metrics_file: "metrics.json"
+  feature_importance_file: "feature_importance.csv"
