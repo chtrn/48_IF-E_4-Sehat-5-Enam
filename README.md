@@ -79,7 +79,7 @@ Folder `laporan/` digunakan untuk menyimpan dokumentasi laporan proyek. Notebook
 ## Peta Komponen Proyek
 
 | Komponen | File utama |
-|---|---|---|
+|---|---|
 | Business Understanding | `notebooks/01_business_data_understanding.ipynb` | 
 | Data Gathering | `notebooks/01_business_data_understanding.ipynb` | 
 | Data Understanding / EDA | `notebooks/01_business_data_understanding.ipynb` | 
