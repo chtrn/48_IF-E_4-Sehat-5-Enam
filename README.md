@@ -6,175 +6,383 @@ Anggota Kelompok: <br>
 - Aisyah Yasmine Kirana (123240064)
 - Chatarina Giftadiyana (123240183)
 - Amalya Kumalasari (123240198)
+
 ## Ringkasan
-Proyek ini menganalisis dan membangun prototipe model untuk **memprediksi nilai akhir Matematika (`G3`) siswa sekolah menengah secara dini** menggunakan faktor demografis, sosial, keluarga, dan sekolah. Dataset yang digunakan adalah **Student Performance — Mathematics (`student-mat.csv`)** dari UCI Machine Learning Repository.
 
-Fokus proyek mengikuti alur **CRISP-DM**, khususnya **Business Understanding**, **Data Understanding**, **Data Preparation**, pemodelan awal, evaluasi, serta penyusunan artefak yang dapat dijalankan ulang. Nilai `G1` dan `G2` sengaja tidak digunakan sebagai fitur karena baru tersedia setelah proses pembelajaran berjalan dan kurang sesuai untuk skenario prediksi dini.
+Proyek ini membahas **prediksi dini nilai akhir Matematika siswa (`G3`)** menggunakan faktor demografis, keluarga, sosial, dan sekolah dari dataset **Student Performance — Mathematics** milik UCI Machine Learning Repository.
 
-**Penting:** model pada repositori ini adalah **prototipe akademik untuk penapisan awal**, bukan sistem yang menentukan kelulusan, penempatan kelas, atau keputusan akademik siswa secara otomatis. Prediksi hanya dimaksudkan sebagai sinyal awal bagi guru atau konselor untuk menentukan siswa yang perlu ditinjau lebih lanjut. Dataset hanya berasal dari dua sekolah di Portugal sehingga hasilnya tidak dapat langsung digeneralisasi ke sekolah di Indonesia tanpa validasi lokal.
+Repositori saat ini memuat data mentah, notebook untuk **Business Understanding, Data Gathering, EDA, dan Cleaning**, serta skrip pendukung untuk validasi data, training model, penggabungan metrik, dan inferensi.
 
-## Temuan awal dari berkas yang diberikan
-- Ukuran dataset: **395 baris × 33 kolom**.
-- Variabel target: **`G3`**, nilai akhir Matematika pada skala 0–20.
-- Sebanyak **130 siswa (32,9%)** memiliki `G3 < 10`.
-- Terdapat **38 siswa (9,6%)** dengan `G3 = 0` yang membentuk pola khusus dan dipertahankan pada analisis utama, kemudian diuji kembali melalui analisis sensitivitas.
-- Tidak ditemukan nilai kosong dan tidak ditemukan baris duplikat penuh pada pemeriksaan awal.
-- `G1` dan `G2` tidak digunakan sebagai fitur model utama.
-- `absences` tidak digunakan pada skenario **prediksi awal tahun**, tetapi disediakan pada skenario tambahan **pertengahan periode** karena waktu ketersediaannya tidak jelas untuk prediksi dini.
-- SHA-256 file `student-mat.csv`: `e47f9ee225e1ee6e69b7564e6dac7123e80b8486677fe111f351964cef5dec80`.
+Nilai `G1` dan `G2` tidak digunakan sebagai fitur pada rancangan prediksi dini karena keduanya merupakan nilai periode sebelumnya. Pada pipeline di folder `src/`, `absences` juga dapat dikeluarkan pada skenario prediksi awal tahun.
 
-Hasil validasi silang yang tersimpan pada repositori menunjukkan bahwa **Random Forest** pada skenario prediksi awal tanpa `absences` memperoleh **RMSE 4,294**, **MAE 3,243**, **R² 0,112**, **recall 0,744**, dan **precision 0,427**. Ketika `absences` digunakan pada skenario pertengahan periode, kinerjanya meningkat menjadi **RMSE 3,848** dan **R² 0,285**. Perbedaan ini harus ditafsirkan dengan hati-hati karena `absences` memiliki hubungan kuat dengan pola pencatatan kelompok `G3 = 0`.
+**Penting:** model pada proyek ini merupakan prototipe akademik. Hasil prediksi tidak dimaksudkan sebagai keputusan otomatis mengenai kelulusan, kenaikan kelas, atau perlakuan terhadap siswa. Hasil model hanya dapat diposisikan sebagai alat bantu penapisan awal yang tetap memerlukan peninjauan manusia.
 
-Jalankan notebook dan skrip pada repositori untuk memverifikasi seluruh angka tersebut dari salinan data yang disertakan.
+## Dataset
 
-## Peta komponen analisis berdasarkan artefak
-
-Bagian utama proyek disediakan dalam notebook, skrip, konfigurasi, dan keluaran eksperimen berikut.
-
-### 1. Reprodusibilitas Analisis — Notebook 01
-
-**File:** `notebooks/01_reproducibility.ipynb`
-
-Mencakup:
-- Pemuatan dan validasi dataset.
-- Pemeriksaan ukuran data dan checksum.
-- Pemeriksaan variabel target dan fitur yang dikecualikan.
-- EDA ringkas yang mendukung keputusan pemodelan.
-- Penyiapan preprocessing.
-- Evaluasi model baseline, Ridge Regression, dan Random Forest.
-- Pemeriksaan hasil skenario utama dan analisis sensitivitas.
-
-Versi notebook yang telah dieksekusi juga tersedia pada:
-
-`notebooks/01_reproducibility.executed.ipynb`
-
-File tersebut dapat digunakan untuk meninjau keluaran terakhir tanpa harus menjalankan ulang seluruh sel terlebih dahulu.
-
-### 2. Data Validation dan Utilitas — `src/common.py`
-
-**File:** `src/common.py`
-
-Mencakup:
-- Pembacaan konfigurasi proyek.
-- Pemeriksaan lokasi dan format data.
-- Verifikasi SHA-256 dataset.
-- Fungsi pendukung yang digunakan oleh skrip eksperimen.
-
-### 3. Preprocessing dan Modeling — `src/train.py`
-
-**File:** `src/train.py`
-
-Mencakup:
-- Penghapusan `G1` dan `G2` dari fitur prediktor.
-- Penghapusan `absences` pada skenario prediksi awal.
-- One-hot encoding untuk variabel kategorikal di dalam pipeline.
-- Validasi silang **5-fold × 3 pengulangan**.
-- Stratifikasi berdasarkan kombinasi status risiko `G3 < 10` dan indikator `G3 = 0`.
-- Evaluasi baseline rata-rata, Ridge Regression, dan Random Forest.
-- Perhitungan RMSE, MAE, R², recall, dan precision.
-- Penyimpanan model serta feature importance.
-
-### 4. Analisis Tiga Skenario
-
-Tiga skenario utama dapat dijalankan secara terpisah:
-
-#### `early_all`
-
-Skenario utama untuk prediksi awal tahun.
-
-- Menggunakan seluruh 395 siswa.
-- `G1`, `G2`, dan `absences` tidak digunakan sebagai fitur.
-- `G3 = 0` tetap dipertahankan.
-
-#### `midperiod_all`
-
-Skenario tambahan untuk kondisi ketika informasi ketidakhadiran sudah tersedia.
-
-- Menggunakan seluruh 395 siswa.
-- `G1` dan `G2` tetap dikeluarkan.
-- `absences` digunakan.
-
-#### `early_without_g3_zero`
-
-Analisis sensitivitas untuk melihat kemampuan model ketika observasi `G3 = 0` dikeluarkan.
-
-- Menggunakan 357 siswa.
-- `G1`, `G2`, dan `absences` tidak digunakan sebagai fitur.
-- Bukan skenario utama, tetapi digunakan untuk menguji sensitivitas hasil.
-
-### 5. Penggabungan Hasil — `src/merge_metrics.py`
-
-**File:** `src/merge_metrics.py`
-
-Menggabungkan hasil ketiga skenario menjadi:
-
-`outputs/metrics.json`
-
-File ini memudahkan perbandingan performa setiap model dan skenario tanpa membuka keluaran eksperimen satu per satu.
-
-### 6. Contoh Inferensi — `src/predict.py`
-
-**File:** `src/predict.py`
-
-Mencakup contoh penggunaan model yang telah disimpan untuk menghasilkan prediksi pada data baru dengan struktur fitur yang sesuai.
-
-**Catatan:** fitur pada data input nyata harus benar-benar tersedia pada waktu prediksi. Skrip ini adalah demonstrasi teknis dan bukan aplikasi produksi.
-
-### Ringkasan cepat
-
-| Komponen | Artefak utama |
-|---|---|
-| Business/Data Understanding dan pemeriksaan reproducibility | `notebooks/01_reproducibility.ipynb` |
-| Data validation dan checksum | `src/common.py` |
-| Preprocessing dan Modeling | `src/train.py` |
-| Penggabungan metrik | `src/merge_metrics.py` |
-| Contoh prediksi | `src/predict.py` |
-| Parameter eksperimen | `config.yaml` |
-| Hasil eksperimen | `outputs/` |
-| Rencana deployment | `deployment_plan.md` |
-
-## Struktur repositori
+Dataset utama berada pada:
 
 ```text
-Lampiran_Portofolio_Reprodusibilitas/
+data/raw/student-mat.csv
+```
+
+Dataset memuat:
+
+- **395 baris** data siswa.
+- **33 variabel**.
+- Target `G3`, yaitu nilai akhir Matematika pada skala 0–20.
+- Variabel demografis, keluarga, aktivitas, dukungan sekolah, perilaku, kehadiran, dan nilai akademik.
+
+Sumber dataset:
+
+> Cortez, P. (2008). *Student Performance*. UCI Machine Learning Repository.  
+> https://doi.org/10.24432/C5TG7T
+
+Dataset Student Performance menggunakan lisensi **CC BY 4.0**.
+
+## Temuan Awal
+
+Berdasarkan pemeriksaan pada notebook yang tersedia:
+
+- Dataset berhasil dibaca dengan ukuran **395 × 33**.
+- Tidak ditemukan missing value pada pemeriksaan awal.
+- Tidak ditemukan baris duplikat penuh.
+- Target `G3` berada pada rentang yang valid 0–20.
+- Terdapat **15 kandidat outlier** pada `absences` berdasarkan aturan IQR.
+- Nilai ekstrem `absences` tidak langsung dihapus karena masih dapat merupakan observasi yang valid.
+- `failures` menunjukkan hubungan negatif yang relatif paling kuat terhadap `G3` di antara variabel numerik/ordinal yang diperiksa pada notebook.
+- Hubungan antarvariabel pada tahap EDA diperlakukan sebagai hubungan asosiatif, bukan hubungan sebab-akibat.
+
+## Struktur Repositori
+
+Struktur utama yang digunakan pada proyek:
+
+```text
+48_IF-E_4-Sehat-5-Enam/
 ├── README.md
 ├── requirements.txt
-├── config.yaml
-├── deployment_plan.md
 ├── data/
-│   └── student-mat.csv
+│   └── raw/
+│       └── student-mat.csv
 ├── notebooks/
-│   ├── 01_reproducibility.ipynb
-│   └── 01_reproducibility.executed.ipynb
+│   └── 01_business_data_understanding.ipynb
 ├── src/
 │   ├── common.py
 │   ├── train.py
 │   ├── merge_metrics.py
 │   └── predict.py
-└── outputs/
-    ├── metrics.json
-    ├── metrics_early_all.json
-    ├── metrics_midperiod_all.json
-    ├── metrics_early_without_g3_zero.json
-    ├── feature_importance.csv
-    ├── model.joblib
-    └── predictions_demo.csv
+└── laporan/
+    └── berkas dokumentasi/laporan proyek
 ```
 
-## Menjalankan di Mac/Linux/Windows
+Folder `laporan/` digunakan untuk menyimpan dokumentasi laporan proyek. Notebook dan kode utama tidak bergantung langsung pada berkas di folder tersebut.
 
-Disarankan menggunakan **Python 3.11**. Dari direktori proyek:
+## Peta Komponen Proyek
+
+| Komponen | File utama | Status |
+|---|---|---|
+| Business Understanding | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
+| Data Gathering | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
+| Data Understanding / EDA | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
+| Cleaning | `notebooks/01_business_data_understanding.ipynb` | Tersedia |
+| Dataset mentah | `data/raw/student-mat.csv` | Tersedia |
+| Validasi data dan checksum | `src/common.py` | Tersedia |
+| Training model | `src/train.py` | Kode tersedia, membutuhkan konfigurasi |
+| Penggabungan metrik | `src/merge_metrics.py` | Kode tersedia, membutuhkan hasil training |
+| Inferensi | `src/predict.py` | Kode tersedia, membutuhkan model hasil training |
+| Dependensi Python | `requirements.txt` | Tersedia, tetapi belum mencakup seluruh dependensi `src/` |
+| Konfigurasi eksperimen | `config.yaml` | Belum tersedia pada root repo |
+| Artefak model/hasil | `outputs/` | Belum tersedia pada root repo |
+
+## 1. Notebook Business Understanding, Data Gathering, EDA, dan Cleaning
+
+**File:**
+
+```text
+notebooks/01_business_data_understanding.ipynb
+```
+
+Notebook ini menjadi artefak analisis utama yang saat ini dapat ditinjau langsung.
+
+Isi notebook mencakup:
+
+- latar belakang proyek;
+- rumusan masalah;
+- tujuan dan metrik;
+- batasan dan aspek etika;
+- sumber dataset UCI;
+- pemuatan `student-mat.csv`;
+- pemeriksaan ukuran, nama kolom, dan tipe data;
+- data dictionary;
+- pemeriksaan kualitas data;
+- analisis distribusi target `G3`;
+- EDA variabel numerik dan kategorikal;
+- pemeriksaan korelasi;
+- pemeriksaan missing value dan duplikasi;
+- cleaning target;
+- pemeriksaan kandidat outlier pada `absences`.
+
+Notebook menggunakan path proyek:
+
+```text
+data/raw/student-mat.csv
+```
+
+Jika dataset belum tersedia, kode notebook memiliki mekanisme untuk mencoba mengunduh arsip Student Performance dari UCI dan menyimpan `student-mat.csv` ke `data/raw/`.
+
+### Catatan
+
+Notebook saat ini berhenti pada tahap **Cleaning dan pemeriksaan outlier**. Walaupun beberapa kelas model sudah diimpor pada bagian awal notebook, training dan evaluasi model belum dijalankan di notebook tersebut.
+
+Dengan demikian, pemodelan pada kondisi repo saat ini berada pada jalur terpisah melalui `src/train.py`.
+
+## 2. Validasi Data — `src/common.py`
+
+File:
+
+```text
+src/common.py
+```
+
+Fungsi utamanya adalah:
+
+- membaca konfigurasi YAML;
+- menyelesaikan path relatif;
+- menghitung SHA-256 dataset;
+- membandingkan checksum dataset;
+- memeriksa jumlah baris dan kolom.
+
+`common.py` digunakan oleh `src/train.py`.
+
+### Ketergantungan
+
+File ini membutuhkan:
+
+```text
+PyYAML
+pandas
+```
+
+`pandas` sudah tersedia di `requirements.txt`, tetapi **PyYAML belum tercantum**.
+
+## 3. Training Model — `src/train.py`
+
+File:
+
+```text
+src/train.py
+```
+
+Skrip ini menyediakan pipeline pemodelan yang lebih lengkap dibanding notebook saat ini.
+
+Model yang digunakan pada skrip:
+
+1. `DummyRegressor` sebagai baseline rata-rata.
+2. `Ridge Regression`.
+3. `RandomForestRegressor`.
+
+Preprocessing:
+
+- fitur kategorikal menggunakan `OneHotEncoder`;
+- fitur numerik menggunakan `StandardScaler`;
+- seluruh preprocessing ditempatkan di dalam `Pipeline`.
+
+Evaluasi menggunakan:
+
+- RMSE;
+- MAE;
+- R²;
+- recall siswa berisiko;
+- precision peringatan.
+
+Skrip menyediakan tiga skenario:
+
+### `early_all`
+
+Prediksi awal menggunakan seluruh observasi.
+
+- `G1` dan `G2` dikeluarkan.
+- `absences` dikeluarkan.
+- observasi `G3 = 0` dipertahankan.
+
+### `midperiod_all`
+
+Skenario ketika informasi kehadiran sudah tersedia.
+
+- `G1` dan `G2` dikeluarkan.
+- `absences` digunakan.
+- observasi `G3 = 0` dipertahankan.
+
+### `early_without_g3_zero`
+
+Analisis sensitivitas.
+
+- `G1` dan `G2` dikeluarkan.
+- `absences` dikeluarkan.
+- observasi dengan `G3 = 0` dikeluarkan.
+
+Validasi dilakukan menggunakan `RepeatedStratifiedKFold`. Stratifikasi dibentuk dari kombinasi status risiko `G3 < threshold` dan indikator `G3 = 0`.
+
+### Ketergantungan terhadap file lain
+
+`train.py` menggunakan:
+
+```text
+src/common.py
+config.yaml
+data/raw/student-mat.csv
+```
+
+Skrip juga membutuhkan paket:
+
+```text
+joblib
+PyYAML
+```
+
+Pada kondisi repo saat ini, `config.yaml` belum tersedia di root dan `joblib` serta `PyYAML` belum tercantum pada `requirements.txt`.
+
+Karena itu, **pipeline `src/train.py` belum dapat dianggap sepenuhnya reproducible dari clone bersih tanpa melengkapi komponen tersebut terlebih dahulu**.
+
+## 4. Penggabungan Metrik — `src/merge_metrics.py`
+
+File:
+
+```text
+src/merge_metrics.py
+```
+
+Skrip ini menggabungkan tiga file hasil:
+
+```text
+outputs/metrics_early_all.json
+outputs/metrics_midperiod_all.json
+outputs/metrics_early_without_g3_zero.json
+```
+
+menjadi:
+
+```text
+outputs/metrics.json
+```
+
+Dengan demikian, `merge_metrics.py` bergantung langsung pada keberhasilan tiga proses training sebelumnya.
+
+Jika salah satu file metrik belum tersedia, skrip akan menghentikan proses dengan `FileNotFoundError`.
+
+## 5. Inferensi — `src/predict.py`
+
+File:
+
+```text
+src/predict.py
+```
+
+Skrip digunakan untuk menghasilkan prediksi `G3` pada data baru menggunakan model yang telah disimpan.
+
+Secara default skrip mengharapkan:
+
+```text
+outputs/model.joblib
+```
+
+Output prediksi berisi tambahan:
+
+- `predicted_G3`;
+- `warning_flag`.
+
+`warning_flag` bernilai benar ketika prediksi berada di bawah ambang peringatan.
+
+### Ketergantungan
+
+`predict.py` bergantung pada artefak model yang dihasilkan oleh `train.py`.
+
+Alurnya adalah:
+
+```text
+train.py
+   ↓
+outputs/model.joblib
+   ↓
+predict.py
+   ↓
+outputs/predictions.csv
+```
+
+Karena artefak `model.joblib` belum tersedia di root repo saat ini, inferensi baru dapat dilakukan setelah pipeline training berhasil dijalankan.
+
+## Keterkaitan Antarfile
+
+Alur konseptual repositori saat ini adalah:
+
+```text
+data/raw/student-mat.csv
+        │
+        ├───────────────→ notebooks/01_business_data_understanding.ipynb
+        │                    │
+        │                    └── Business Understanding
+        │                        Data Gathering
+        │                        EDA
+        │                        Cleaning
+        │
+        └──→ config.yaml ──→ src/common.py
+                              │
+                              ↓
+                         src/train.py
+                              │
+              ┌───────────────┼────────────────┐
+              ↓               ↓                ↓
+       metrics_early    metrics_midperiod   metrics_without_zero
+              │               │                │
+              └───────────────┼────────────────┘
+                              ↓
+                   src/merge_metrics.py
+                              ↓
+                      outputs/metrics.json
+
+                         src/train.py
+                              ↓
+                     outputs/model.joblib
+                              ↓
+                       src/predict.py
+                              ↓
+                  outputs/predictions.csv
+```
+
+Bagian kiri, yaitu notebook, sudah dapat digunakan untuk analisis data awal. Bagian kanan, yaitu pipeline skrip, secara desain saling berkaitan tetapi saat ini masih memerlukan `config.yaml` dan dependensi tambahan.
+
+## Hubungan Notebook dan Skrip
+
+Notebook dan skrip membahas proyek serta dataset yang sama, tetapi keduanya **belum merupakan satu pipeline yang sepenuhnya terintegrasi**.
+
+Perbedaannya:
+
+| Aspek | Notebook 01 | `src/train.py` |
+|---|---|---|
+| Dataset | `data/raw/student-mat.csv` | Ditentukan melalui `config.yaml` |
+| Fokus | Business Understanding, EDA, Cleaning | Modeling dan evaluasi |
+| Baseline | Dicantumkan pada rencana notebook | `DummyRegressor` |
+| Model linear | Notebook menyebut `LinearRegression` | Menggunakan `Ridge` |
+| Random Forest | Diimpor, belum dilatih di notebook | Digunakan |
+| Validasi | Belum masuk tahap modeling | Repeated Stratified K-Fold |
+| Output model | Tidak ada | Dirancang menghasilkan `model.joblib` |
+
+Karena itu, README ini tidak menyatakan bahwa hasil modeling dari `src/train.py` sudah direproduksi oleh notebook.
+
+## Menjalankan Notebook
+
+Disarankan menggunakan Python 3.10–3.12.
+
+Clone repositori:
+
+```bash
+git clone https://github.com/chtrn/48_IF-E_4-Sehat-5-Enam.git
+cd 48_IF-E_4-Sehat-5-Enam
+```
+
+Buat virtual environment:
 
 ```bash
 python -m venv .venv
-```
-
-Aktifkan virtual environment.
-
-### macOS/Linux
-
-```bash
-source .venv/bin/activate
 ```
 
 ### Windows PowerShell
@@ -183,145 +391,130 @@ source .venv/bin/activate
 .venv\Scripts\Activate.ps1
 ```
 
-Kemudian instal dependensi:
+### macOS/Linux
+
+```bash
+source .venv/bin/activate
+```
+
+Instal dependensi:
 
 ```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Untuk membuka notebook:
+Jalankan Jupyter:
 
 ```bash
-jupyter notebook notebooks/01_reproducibility.ipynb
+jupyter lab
 ```
 
-Jalankan notebook dari sel pertama sampai terakhir.
-
-## Menjalankan eksperimen dari skrip
-
-### 1. Skenario prediksi awal
-
-```bash
-python src/train.py --config config.yaml --scenario early_all
-```
-
-### 2. Skenario pertengahan periode
-
-```bash
-python src/train.py --config config.yaml --scenario midperiod_all
-```
-
-### 3. Analisis sensitivitas tanpa G3 = 0
-
-```bash
-python src/train.py --config config.yaml --scenario early_without_g3_zero
-```
-
-### 4. Menggabungkan hasil
-
-```bash
-python src/merge_metrics.py
-```
-
-Hasil akhir dapat diperiksa pada:
+Kemudian buka:
 
 ```text
-outputs/metrics.json
+notebooks/01_business_data_understanding.ipynb
 ```
 
-## Contoh menjalankan prediksi
+dan jalankan sel dari atas ke bawah.
 
-Model hasil eksperimen disimpan pada:
+## Status Reprodusibilitas Saat Ini
+
+### Sudah dapat dijalankan
+
+Notebook:
 
 ```text
-outputs/model.joblib
+notebooks/01_business_data_understanding.ipynb
 ```
 
-Contoh penggunaan:
+beserta dataset:
 
-```bash
-python src/predict.py \
-  --model outputs/model.joblib \
-  --input data/student-mat.csv \
-  --sep ";"
+```text
+data/raw/student-mat.csv
 ```
 
-Pada Windows PowerShell perintah dapat ditulis dalam satu baris:
+sudah saling terhubung melalui path relatif proyek.
 
-```powershell
-python src/predict.py --model outputs/model.joblib --input data/student-mat.csv --sep ";"
+### Belum lengkap untuk pipeline skrip
+
+Agar `src/train.py`, `src/merge_metrics.py`, dan `src/predict.py` dapat membentuk alur end-to-end dari clone bersih, repo masih perlu melengkapi:
+
+1. `config.yaml`;
+2. `joblib` pada `requirements.txt`;
+3. `PyYAML` pada `requirements.txt`;
+4. folder `outputs/` akan dihasilkan setelah training, sehingga tidak harus disimpan sejak awal;
+5. model dan file metrik harus dihasilkan ulang sebelum `predict.py` dan `merge_metrics.py` digunakan.
+
+## Dependensi
+
+Isi `requirements.txt` saat ini:
+
+```text
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+seaborn>=0.12
+scikit-learn>=1.3
+jupyterlab>=4.0
+notebook>=7.0
 ```
 
-Perintah tersebut hanya digunakan untuk demonstrasi pipeline. Untuk penggunaan sebenarnya, input seharusnya berupa data siswa baru dan tidak memuat target `G3` sebagai informasi yang digunakan untuk prediksi.
+Untuk menjalankan seluruh kode pada folder `src/`, tambahkan:
 
-## Alur analisis
+```text
+joblib
+PyYAML
+```
 
-1. Memuat `student-mat.csv` dan memverifikasi ukuran serta checksum dataset.
-2. Memisahkan `G3` sebagai target dan mengeluarkan `G1` serta `G2` dari fitur.
-3. Membentuk indikator analisis untuk status risiko (`G3 < 10`) dan kelompok `G3 = 0`.
-4. Menjalankan preprocessing di dalam pipeline agar transformasi tidak memanfaatkan data pada fold validasi.
-5. Melakukan repeated stratified cross-validation sebanyak **5 fold × 3 pengulangan**.
-6. Membandingkan baseline rata-rata, Ridge Regression, dan Random Forest.
-7. Mengevaluasi RMSE, MAE, R², recall siswa berisiko, dan precision peringatan.
-8. Menjalankan skenario utama prediksi awal, skenario pertengahan periode, dan analisis sensitivitas tanpa `G3 = 0`.
-9. Menyimpan metrik, feature importance, model, serta contoh keluaran prediksi pada folder `outputs/`.
+## Data, Privasi, dan Etika
 
-## Konfigurasi eksperimen
+Dataset tidak memuat nama atau identitas langsung siswa, tetapi tetap mengandung atribut demografis, keluarga, kesehatan, konsumsi alkohol, dan hubungan pribadi.
 
-Parameter utama disimpan dalam `config.yaml` agar eksperimen dapat dijalankan ulang tanpa mengubah kode sumber secara langsung.
+Karena itu:
 
-Konfigurasi utama meliputi:
+- data tidak sebaiknya digabungkan dengan sumber identitas lain;
+- hasil model tidak digunakan untuk memberi stigma pada siswa;
+- prediksi tidak menggantikan penilaian guru atau konselor;
+- feature importance tidak boleh dibaca sebagai hubungan sebab-akibat;
+- generalisasi ke sekolah di Indonesia memerlukan validasi menggunakan data lokal.
 
-- `random_seed: 42`
-- target: `G3`
-- ambang risiko aktual: `G3 < 10`
-- ambang peringatan prediksi: prediksi `G3 < 11`
-- validasi: 5 fold × 3 pengulangan
-- Random Forest: 300 estimator
-- fitur yang selalu dikeluarkan: `G1` dan `G2`
-- fitur tambahan yang dikeluarkan pada prediksi awal: `absences`
+## Rencana Deployment
 
-## Data, privasi, dan lisensi
+Deployment yang proporsional untuk konteks proyek ini adalah **batch/offline internal**, bukan aplikasi keputusan otomatis.
 
-Sumber dataset:
+Tahapan yang disarankan:
 
-**Cortez, P. (2008). Student Performance. UCI Machine Learning Repository.**  
-DOI: https://doi.org/10.24432/C5TG7T
+1. **Reproducibility lokal**  
+   Pastikan notebook dan pipeline training dapat dijalankan dari clone bersih.
 
-Dataset Student Performance tersedia dengan lisensi **Creative Commons Attribution 4.0 International (CC BY 4.0)**. Penggunaan dan adaptasi diperbolehkan selama atribusi kepada sumber tetap diberikan.
+2. **Validasi pada data sekolah sasaran**  
+   Model perlu diuji menggunakan data lokal dan hanya menggunakan atribut yang benar-benar tersedia pada saat prediksi.
 
-Dataset tidak memuat nama, nomor induk siswa, atau kontak langsung. Namun, beberapa atribut seperti sekolah, usia, jenis kelamin, alamat, pekerjaan orang tua, konsumsi alkohol, kesehatan, dan hubungan romantis merupakan informasi yang perlu diperlakukan secara hati-hati. Data pada proyek ini tidak boleh digabungkan dengan sumber identitas lain untuk mencoba mengidentifikasi individu.
+3. **Batch prediction**  
+   Data siswa diproses secara periodik untuk menghasilkan daftar prioritas peninjauan.
 
-## Batasan utama
+4. **Human-in-the-loop**  
+   Guru atau konselor meninjau hasil sebelum tindakan apa pun dilakukan.
 
-- Dataset hanya berisi **395 siswa** dari dua sekolah di Portugal.
-- Data berasal dari konteks sekitar tahun ajaran 2005–2006 dan tidak mewakili kondisi sekolah Indonesia saat ini.
-- Model bersifat **prediktif dan asosiatif**, bukan kausal.
-- `G3 = 0` memiliki pola khusus yang tidak dijelaskan secara eksplisit oleh dokumentasi sumber.
-- Waktu ketersediaan `absences` tidak cukup jelas untuk menjadikannya fitur prediksi awal tahun.
-- Beberapa fitur demografis dan keluarga dapat bertindak sebagai atribut sensitif atau proksi kondisi sosial.
-- Nilai feature importance tidak boleh ditafsirkan sebagai bukti bahwa suatu fitur menyebabkan nilai siswa naik atau turun.
-- Model tidak boleh digunakan sebagai satu-satunya dasar untuk mengambil keputusan terhadap siswa.
-- Validasi pada data sekolah sasaran wajib dilakukan sebelum penggunaan operasional.
+5. **Monitoring**  
+   Pantau RMSE, MAE, R², recall, precision, perubahan distribusi data, serta perbedaan error antar kelompok.
 
-## Rencana deployment
+Model tidak direkomendasikan untuk deployment operasional sebelum validasi lokal dilakukan.
 
-Deployment dirancang secara proporsional karena proyek ini masih berupa prototipe akademik.
+## Batasan Utama
 
-Tahap yang direkomendasikan:
+- Dataset hanya terdiri dari 395 siswa.
+- Data berasal dari dua sekolah di Portugal.
+- Konteks dataset tidak otomatis mewakili sekolah di Indonesia.
+- Data bersifat observasional sehingga hubungan yang ditemukan tidak membuktikan kausalitas.
+- `G3 = 0` memiliki pola khusus yang perlu diperiksa lebih lanjut.
+- Waktu ketersediaan `absences` harus dipastikan jika model digunakan untuk prediksi awal.
+- Notebook dan pipeline `src/` belum sepenuhnya terintegrasi.
+- Pipeline training belum dapat dijalankan dari clone bersih sebelum `config.yaml`, `joblib`, dan `PyYAML` dilengkapi.
 
-1. **Tahap reproducibility/offline** — model dijalankan melalui notebook atau skrip pada data yang telah disiapkan.
-2. **Tahap pilot lokal** — pipeline diuji menggunakan data historis sekolah sasaran dan struktur fitur yang benar-benar tersedia pada awal tahun ajaran.
-3. **Tahap validasi** — kinerja, recall siswa berisiko, precision, dan galat antarkelompok diperiksa sebelum digunakan oleh pengguna akhir.
-4. **Tahap penggunaan terbatas** — bila hasil validasi memadai, model dapat ditempatkan sebagai proses batch internal yang menghasilkan daftar siswa untuk ditinjau oleh guru atau konselor.
-5. **Human-in-the-loop** — seluruh keluaran tetap memerlukan pemeriksaan manusia dan tidak digunakan sebagai keputusan otomatis.
-6. **Monitoring** — performa model, perubahan distribusi data, serta perbedaan galat antar kelompok perlu diperiksa secara berkala.
+## Catatan Repositori
 
-Rincian deployment tersedia pada `deployment_plan.md`.
+README ini disusun mengikuti file yang benar-benar dapat diverifikasi pada repositori saat ini. File atau output yang belum tersedia di GitHub tidak dicantumkan sebagai artefak yang sudah ada.
 
-## Catatan penggunaan
-
-Repositori ini dibuat untuk **portofolio dan reprodusibilitas tugas Data Science**. Artefak di dalamnya memungkinkan pemeriksa menjalankan kembali alur eksperimen, memeriksa konfigurasi, membandingkan skenario, dan memverifikasi keluaran yang dilaporkan.
-
-Hasil model harus dipahami sebagai **alat penapisan kasar untuk eksperimen akademik**, bukan sebagai pengganti penilaian guru, konselor, atau kebijakan sekolah.
+Setelah `config.yaml` dan dependensi pipeline dilengkapi, dokumentasi dapat diperbarui kembali dengan hasil training, metrik final, feature importance, dan contoh inferensi yang benar-benar dihasilkan dari repositori.
